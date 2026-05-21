@@ -1,0 +1,5 @@
+/* minimal styles */
+* { box-sizing: border-box }
+input, textarea, button { font: inherit }
+button { padding: 6px 10px }
+.file input { display:none }
