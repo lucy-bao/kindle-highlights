@@ -1,58 +1,162 @@
 <template>
-  <div class="container">
-    <h1>Kindle Highlights</h1>
+  <main>
+    <HomePage
+      v-if="page === 'home'"
+      :has-data="hasData"
+      :query="query"
+      :selected-book="selectedBook"
+      :status-message="statusMessage"
+      :summary-text="summaryText"
+      :view-mode="viewMode"
+      :visible-books="visibleBooks"
+      :visible-highlights="visibleHighlights"
+      :search-groups="searchGroups"
+      @open-card="openCard"
+      @open-import="openImport"
+      @select-book="selectBook"
+      @update:query="query = $event"
+      @update:view-mode="viewMode = $event"
+    />
 
-    <div class="controls">
-      <label class="file">
-        Upload highlights file
-        <input type="file" @change="onFile" accept=".txt" />
-      </label>
-      <button @click="parse">Parse</button>
-    </div>
+    <ImportPage
+      v-else
+      :error="importError"
+      @back="page = 'home'"
+      @pick-file-access="pickFileWithSystemDialog"
+      @upload-file="importFile"
+    />
 
-    <textarea v-model="text" placeholder="Or paste highlights here" rows="8"></textarea>
-
-    <div class="results">
-      <div v-for="item in items" :key="item.title" class="book">
-        <h2>{{ item.title }}</h2>
-        <ul>
-          <li v-for="(h, i) in item.highlights" :key="i">{{ h }}</li>
-        </ul>
-      </div>
-    </div>
-  </div>
+    <ExportCardModal v-if="cardItem" :item="cardItem" @close="cardItem = null" />
+  </main>
 </template>
 
-<script>
-import { ref } from 'vue'
-import { parseHighlights } from './parser'
+<script setup>
+import { computed, onMounted, ref } from 'vue'
+import ExportCardModal from './components/ExportCardModal.vue'
+import HomePage from './components/HomePage.vue'
+import ImportPage from './components/ImportPage.vue'
+import { useClippingsStorage } from './composables/useClippingsStorage'
+import { groupByBook } from './parser'
+import { clippingTimeValue } from './utils/formatters'
 
-export default {
-  setup() {
-    const text = ref('')
-    const items = ref([])
+const { importBrowserFile, pickFileWithAccessApi, restoreLastFile } = useClippingsStorage()
 
-    function onFile(e) {
-      const f = e.target.files[0]
-      if (!f) return
-      const reader = new FileReader()
-      reader.onload = () => (text.value = reader.result)
-      reader.readAsText(f, 'utf-8')
-    }
+const page = ref('home')
+const query = ref('')
+const highlights = ref([])
+const viewMode = ref('books')
+const selectedBook = ref(null)
+const statusMessage = ref('')
+const importError = ref('')
+const cardItem = ref(null)
 
-    function parse() {
-      items.value = parseHighlights(text.value || '')
-    }
+const books = computed(() => groupByBook(highlights.value))
+const hasData = computed(() => highlights.value.length > 0)
+const normalizedQuery = computed(() => query.value.toLowerCase())
 
-    return { text, items, onFile, parse }
-  },
+// 首页列表数据：书架、划线列表、书籍详情都从同一份 highlights 派生。
+const visibleHighlights = computed(() => {
+  let source = highlights.value
+
+  if (selectedBook.value && !query.value) {
+    source = selectedBook.value.highlights
+  }
+
+  if (!normalizedQuery.value) return sortByClippingTime(source)
+
+  return sortByClippingTime(
+    source.filter((item) => {
+      const haystack = `${item.content} ${item.title} ${item.author}`.toLowerCase()
+      return haystack.includes(normalizedQuery.value)
+    }),
+  )
+})
+
+const visibleBooks = computed(() => {
+  if (!normalizedQuery.value) return books.value
+
+  const matchedBookIds = visibleHighlights.value.map((item) => `${item.title}__${item.author}`)
+  return books.value.filter((book) => matchedBookIds.includes(book.id))
+})
+
+const searchGroups = computed(() => {
+  if (!normalizedQuery.value) return []
+
+  return groupByBook(visibleHighlights.value).map((book) => ({
+    ...book,
+    highlights: sortByClippingTime(book.highlights),
+  }))
+})
+
+// 统计文案集中在这里，避免页面组件里混入业务判断。
+const summaryText = computed(() => {
+  if (!hasData.value) return '共解析出 0 本书籍，0 条划线'
+  if (query.value) return `找到 ${visibleHighlights.value.length} 条相关划线`
+  if (selectedBook.value) return `${selectedBook.value.author} · ${selectedBook.value.highlights.length} 条划线`
+  return `共解析出 ${books.value.length} 本书籍，${highlights.value.length} 条划线`
+})
+
+onMounted(async () => {
+  const result = await restoreLastFile()
+  if (result?.highlights) applyHighlights(result.highlights)
+  if (result?.message) showStatus(result.message)
+})
+
+function openImport() {
+  importError.value = ''
+  page.value = 'import'
+}
+
+function selectBook(book) {
+  selectedBook.value = book
+  query.value = ''
+}
+
+async function pickFileWithSystemDialog() {
+  importError.value = ''
+  const result = await pickFileWithAccessApi()
+  applyImportResult(result)
+}
+
+async function importFile(file) {
+  importError.value = ''
+  const result = await importBrowserFile(file)
+  applyImportResult(result)
+}
+
+function applyImportResult(result) {
+  if (!result || result.cancelled) return
+
+  if (result.error) {
+    importError.value = result.error
+    return
+  }
+
+  applyHighlights(result.highlights, `已导入 ${result.fileName}`)
+  page.value = 'home'
+}
+
+// 每次导入或恢复文件后，都重置为书架默认浏览状态。
+function applyHighlights(parsed, message = '') {
+  highlights.value = parsed
+  selectedBook.value = null
+  viewMode.value = 'books'
+
+  if (message) showStatus(message)
+}
+
+function showStatus(message) {
+  statusMessage.value = message
+  window.setTimeout(() => {
+    if (statusMessage.value === message) statusMessage.value = ''
+  }, 2400)
+}
+
+function openCard(item) {
+  cardItem.value = item
+}
+
+function sortByClippingTime(items) {
+  return [...items].sort((a, b) => clippingTimeValue(b) - clippingTimeValue(a))
 }
 </script>
-
-<style>
-body { font-family: system-ui, Arial, sans-serif; padding: 1rem; }
-.container { max-width: 780px; margin: 0 auto; }
-.controls { display:flex; gap:8px; align-items:center; margin-bottom:8px }
-textarea { width:100%; font-family: monospace; }
-.book { border-top:1px solid #eee; padding-top:8px; margin-top:8px }
-</style>
