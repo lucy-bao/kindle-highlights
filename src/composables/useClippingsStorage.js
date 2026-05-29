@@ -3,7 +3,8 @@ import { parseClippings } from '../parser'
 const DB_NAME = 'kindle-highlights'
 const DB_STORE = 'files'
 const LAST_FILE_KEY = 'last-file-handle'
-const FALLBACK_TEXT_KEY = 'kindle-highlights:last-text'
+const CACHE_KEY = 'kindle-highlights:file-cache'
+const LEGACY_TEXT_KEY = 'kindle-highlights:last-text'
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -25,23 +26,6 @@ async function saveHandle(handle) {
   })
 }
 
-async function readHandle() {
-  if (!window.showOpenFilePicker) return null
-
-  try {
-    const db = await openDatabase()
-
-    return await new Promise((resolve, reject) => {
-      const tx = db.transaction(DB_STORE, 'readonly')
-      const request = tx.objectStore(DB_STORE).get(LAST_FILE_KEY)
-      request.onsuccess = () => resolve(request.result || null)
-      request.onerror = () => reject(request.error)
-    })
-  } catch {
-    return null
-  }
-}
-
 async function parseTextFile(file) {
   if (!file) return { cancelled: true }
 
@@ -59,13 +43,51 @@ async function parseTextFile(file) {
   return { fileName: file.name, highlights, text }
 }
 
+function saveTextCache({ fileName = '', text }) {
+  // localStorage 只保留这一份最新解析文本缓存，再次导入会覆盖旧缓存。
+  localStorage.setItem(
+    CACHE_KEY,
+    JSON.stringify({
+      fileName,
+      text,
+      updatedAt: Date.now(),
+    }),
+  )
+  localStorage.removeItem(LEGACY_TEXT_KEY)
+}
+
+function readTextCache(message = '') {
+  const cached = localStorage.getItem(CACHE_KEY)
+  const legacyText = localStorage.getItem(LEGACY_TEXT_KEY)
+  const payload = cached ? parseCachePayload(cached) : legacyText ? { text: legacyText } : null
+
+  if (!payload?.text) return { message }
+
+  const highlights = parseClippings(payload.text)
+  if (!highlights.length) return { message }
+
+  return {
+    fileName: payload.fileName || '缓存文件',
+    highlights,
+    message,
+  }
+}
+
+function parseCachePayload(value) {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return { text: value }
+  }
+}
+
 export function useClippingsStorage() {
   async function importBrowserFile(file) {
     const result = await parseTextFile(file)
     if (result.error || !result.highlights) return result
 
-    // 普通 input/拖拽拿不到真实路径，保存文本副本作为兼容降级。
-    localStorage.setItem(FALLBACK_TEXT_KEY, result.text)
+    // 普通 input/拖拽拿不到真实路径，直接覆盖唯一文本缓存。
+    saveTextCache(result)
     return result
   }
 
@@ -83,7 +105,7 @@ export function useClippingsStorage() {
 
       // 支持 File System Access API 时保存文件句柄，下次打开优先读取原文件。
       await saveHandle(handle)
-      localStorage.setItem(FALLBACK_TEXT_KEY, result.text)
+      saveTextCache(result)
       return result
     } catch (error) {
       if (error?.name === 'AbortError') return { cancelled: true }
@@ -92,32 +114,10 @@ export function useClippingsStorage() {
   }
 
   async function restoreLastFile() {
-    const handle = await readHandle()
+    const cached = readTextCache()
+    if (cached.highlights) return cached
 
-    if (handle) {
-      try {
-        const permission = await handle.requestPermission?.({ mode: 'read' })
-
-        if (!permission || permission === 'granted') {
-          const result = await parseTextFile(await handle.getFile())
-          if (result.highlights) return result
-        }
-      } catch {
-        return restoreFallbackText('无法读取上次文件，已尝试使用浏览器缓存内容')
-      }
-    }
-
-    return restoreFallbackText()
-  }
-
-  function restoreFallbackText(message = '') {
-    const cachedText = localStorage.getItem(FALLBACK_TEXT_KEY)
-    if (!cachedText) return { message }
-
-    const highlights = parseClippings(cachedText)
-    if (!highlights.length) return { message }
-
-    return { highlights, message }
+    return {}
   }
 
   return {

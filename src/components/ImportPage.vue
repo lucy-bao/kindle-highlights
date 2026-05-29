@@ -1,10 +1,15 @@
 <template>
   <section class="import-page">
-    <button class="back" @click="$emit('back')">‹ 返回书架</button>
+    <button class="back" @click="$emit('back')">
+      <img :src="backIcon" alt="" />
+      返回书架
+    </button>
     <div class="import-hero">
-      <div class="book-icon">▥</div>
-      <h1>让你的 Kindle 划线重获新生</h1>
-      <p>导入 Kindle 的 My Clippings.txt 文件，以优雅的书架模式浏览，并一键生成精美的社交分享卡片。</p>
+      <span class="book-icon">
+        <img :src="bookIcon" alt="" />
+      </span>
+      <h1>让你的 Kindle 书摘重获新生</h1>
+      <p>导入 Kindle 的 My Clippings.txt 文件，一键整理方便浏览，并支持生成精美的社交分享卡片。</p>
     </div>
 
     <div
@@ -21,7 +26,7 @@
       @drop.prevent="onDrop"
     >
       <input ref="fileInput" type="file" accept=".txt,text/plain" @click.stop @change="onFileInput" />
-      <span class="upload-icon">☁</span>
+      <img class="upload-icon" :src="uploadIcon" alt="" />
       <strong>点击或拖拽文件到此处</strong>
       <small>支持 My Clippings.txt 文件</small>
     </div>
@@ -32,6 +37,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import uploadIcon from '../assets/images/上传.svg'
+import bookIcon from '../assets/images/书.svg'
+import backIcon from '../assets/images/返回.svg'
 
 defineProps({
   error: { type: String, default: '' },

@@ -1,7 +1,7 @@
 <template>
   <section class="shell">
     <header class="topbar">
-      <button class="brand" @click="$emit('select-book', null)">Kindle Clippings</button>
+      <button class="brand" @click="$emit('select-book', null)">Kindle书摘</button>
       <label class="search">
         <span aria-hidden="true">⌕</span>
         <input
@@ -159,7 +159,16 @@
       </section>
 
       <section v-else class="books-grid">
-        <article v-for="book in visibleBooks" :key="book.id" class="book-card" @click="$emit('select-book', book)">
+        <article
+          v-for="book in visibleBooks"
+          :key="book.id"
+          class="book-card"
+          role="button"
+          tabindex="0"
+          @click="$emit('select-book', book)"
+          @keydown.enter.prevent="$emit('select-book', book)"
+          @keydown.space.prevent="$emit('select-book', book)"
+        >
           <div class="cover">
             <strong>{{ compactTitle(book.title) }}</strong>
             <span>{{ book.highlights.length }}</span>

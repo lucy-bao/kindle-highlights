@@ -2,10 +2,31 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: "HuiwenMingchaoGBK";
+  src: url("./assets/fonts/汇文明朝体GBKv1.001.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JiangchengYuanti600";
+  src: url("./assets/fonts/江城圆体 600W.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BaDingShiWeiTi16";
+  src: url("./assets/fonts/BaDingShiWeiTi-16.ttf") format("truetype");
+  font-display: swap;
+}
+
 :root {
   color: #1f2328;
   background: #f6f6f7;
   --serif-font: "Songti SC", "SimSun", "STSong", serif;
+  --vintage-font: "HuiwenMingchaoGBK", "汇文明朝体GBK", "MingLiU", "Songti SC", "SimSun", "STSong", serif;
+  --cute-font: "JiangchengYuanti600", "Microsoft YaHei", sans-serif;
+  --pixel-font: "BaDingShiWeiTi16", "Microsoft YaHei", sans-serif;
   font-family:
     Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-synthesis: none;
@@ -170,8 +191,7 @@ button {
   text-align: center;
 }
 
-.empty-icon,
-.book-icon {
+.empty-icon {
   display: grid;
   place-items: center;
   width: 72px;
@@ -212,6 +232,25 @@ button {
   min-width: 0;
   font-family: var(--serif-font);
   cursor: pointer;
+}
+
+.book-card .cover,
+.book-card h2 {
+  transition:
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.book-card:hover .cover,
+.book-card:focus-visible .cover {
+  box-shadow: 0 18px 30px rgba(18, 24, 33, 0.18);
+  transform: translateY(-4px);
+}
+
+.book-card:hover h2,
+.book-card:focus-visible h2 {
+  color: #111418;
 }
 
 .cover {
@@ -463,30 +502,60 @@ button {
 }
 
 .import-page {
+  width: min(100%, 1120px);
   min-height: 100vh;
-  padding: 34px min(16vw, 250px) 72px;
+  margin: 0 auto;
+  padding: 28px 56px 42px;
   background: #f7f7f8;
 }
 
 .back {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0;
   background: transparent;
   color: #68717f;
   font-weight: 700;
 }
 
+.back img {
+  width: 16px;
+  height: 16px;
+}
+
 .import-hero {
   display: grid;
   justify-items: center;
-  gap: 22px;
+  gap: 14px;
   max-width: 860px;
-  margin: 118px auto 62px;
+  margin: 54px auto 34px;
   text-align: center;
+}
+
+.book-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border-radius: 18px;
+  background: #1c1d1f;
+  filter: drop-shadow(0 20px 38px rgba(31, 35, 40, 0.12));
+}
+
+.book-icon img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
 
 .import-hero h1 {
   margin: 0;
   font-family: Georgia, "Songti SC", serif;
-  font-size: clamp(36px, 5vw, 64px);
+  font-size: clamp(32px, 4.2vw, 54px);
   line-height: 1.18;
   letter-spacing: 0;
 }
@@ -494,15 +563,17 @@ button {
 .import-hero p {
   max-width: 820px;
   margin: 0;
-  font-size: 24px;
-  line-height: 1.75;
+  font-size: 20px;
+  line-height: 1.6;
 }
 
 .dropzone {
   display: grid;
   place-items: center;
-  gap: 14px;
-  min-height: 300px;
+  align-content: center;
+  gap: 10px;
+  min-height: 320px;
+  padding: 26px;
   border: 2px dashed #cfd5dd;
   border-radius: 24px;
   background: #fff;
@@ -526,110 +597,324 @@ button {
 }
 
 .upload-icon {
-  color: #cfd5dd;
-  font-size: 62px;
-  line-height: 1;
+  width: 58px;
+  height: 58px;
 }
 
 .dropzone strong {
-  font-size: 24px;
+  font-size: 22px;
 }
 
-.modal {
+.dropzone small {
+  font-size: 16px;
+}
+
+.card-modal {
   position: fixed;
   inset: 0;
+  z-index: 20;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background: rgba(15, 17, 20, 0.46);
+  padding: 32px;
+  overflow: auto;
+  background: rgba(15, 17, 20, 0.42);
 }
 
-.card-panel {
-  width: min(680px, 100%);
-  padding: 22px;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
-}
-
-.panel-head,
-.style-options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.panel-head h2 {
-  margin: 0;
-}
-
-.panel-head button {
-  width: 34px;
-  height: 34px;
+.card-close {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 21;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: #eef1f5;
-  color: #23272e;
+  background: #cfcfcf;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.card-designer {
+  position: relative;
+  width: min(1120px, calc(100vw - 64px));
+  max-height: calc(100vh - 64px);
+  padding: 52px 42px 38px;
+  overflow: auto;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+}
+
+.card-tabs {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 42px;
+}
+
+.card-tabs button {
+  min-width: 86px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 8px;
+  background: transparent;
+  color: #697386;
+  font-family: var(--serif-font);
   font-size: 24px;
+  font-weight: 700;
 }
 
-.style-options {
-  justify-content: start;
-  margin: 20px 0;
+.card-tabs button.active {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
 }
 
-.export-card {
+.card-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.share-card-preview {
+  width: 100%;
+  height: min(480px, calc(100vh - 320px));
+  min-height: 360px;
+  overflow: auto;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.16);
+}
+
+.share-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  min-height: 360px;
-  padding: 42px;
-  border-radius: 8px;
-  overflow: hidden;
+  min-height: 480px;
+  padding: 54px 72px 42px;
+  border-radius: 12px;
+  background: #fff;
+  color: #111;
+  font-family: var(--serif-font);
 }
 
-.export-card.classic {
-  background: #ffffff;
-  color: #1d2228;
-  border: 1px solid #e4e1dc;
+.share-quote,
+.share-meta {
+  width: 100%;
 }
 
-.export-card.ink {
-  background: #1c1d1f;
-  color: #f8f6ef;
+.share-card.export-mode {
+  width: 1626px;
+  height: auto;
+  min-height: 746px;
+  border-radius: 0;
 }
 
-.export-card.warm {
-  background: #fbf2df;
-  color: #28313b;
-}
-
-.export-quote {
+.share-quote {
   margin: 0;
-  font-family: Georgia, "Songti SC", serif;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.6;
+  font-size: 36px;
+  line-height: 1.48;
+  letter-spacing: 0;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-.export-card strong,
-.export-card span {
-  display: block;
+.share-meta {
+  margin-top: 54px;
 }
 
-.export-card strong {
-  margin-bottom: 8px;
+.share-meta p {
+  margin: 0;
 }
 
-.export-card span {
-  opacity: 0.72;
+.share-book {
+  max-width: 100%;
+  color: #1b1b1b;
+  font-size: 22px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
-.primary {
+.share-author,
+.share-date {
+  color: #a0a0a0;
+  font-size: 22px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.share-card.style-tech {
+  background: #000;
+  color: #00e083;
+}
+
+.share-card.style-tech .share-quote,
+.share-card.style-tech .share-book {
+  color: #00e083;
+}
+
+.share-card.style-tech .share-author,
+.share-card.style-tech .share-date {
+  color: #f2f2f2;
+}
+
+.share-card.style-vintage {
+  position: relative;
+  background: #f4ecd9;
+  color: #000;
+  font-family: var(--vintage-font);
+}
+
+.share-card.style-vintage .share-quote {
+  color: #000;
+  font-family: var(--vintage-font);
+  font-weight: 700;
+}
+
+.share-card.style-vintage .share-book {
+  color: #111;
+  font-family: var(--vintage-font);
+}
+
+.share-card.style-vintage .share-author {
+  color: #a5a5a5;
+  font-family: var(--vintage-font);
+}
+
+.share-card.style-vintage .share-date {
+  display: none;
+}
+
+.share-stamp {
+  position: absolute;
+  right: 72px;
+  bottom: 42px;
+  width: 132px;
+  height: 132px;
+  color: #8b0000;
+  font-family: var(--vintage-font);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.share-stamp img {
   width: 100%;
-  margin-top: 18px;
+  height: 100%;
+  object-fit: contain;
+}
+
+.share-card.style-cute {
+  position: relative;
+  overflow: hidden;
+  background: #f7f3df;
+  color: #6b5c43;
+  font-family: var(--cute-font);
+}
+
+.share-card.style-cute .share-quote,
+.share-card.style-cute .share-book,
+.share-card.style-cute .share-author,
+.share-card.style-cute .share-date {
+  position: relative;
+  z-index: 1;
+  font-family: var(--cute-font);
+  font-weight: 700;
+}
+
+.share-card.style-cute .share-quote,
+.share-card.style-cute .share-book,
+.share-card.style-cute .share-author,
+.share-card.style-cute .share-date {
+  color: #6b5c43;
+}
+
+.share-wave-footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 132px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.share-card.style-pixel {
+  position: relative;
+  padding-top: 154px;
+  overflow: hidden;
+  background: #ffd384;
+  color: #4c1d19;
+  font-family: var(--pixel-font);
+}
+
+.share-card.style-pixel .share-quote,
+.share-card.style-pixel .share-book,
+.share-card.style-pixel .share-author,
+.share-card.style-pixel .share-date {
+  position: relative;
+  z-index: 1;
+  color: #4c1d19;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+}
+
+.share-card.style-pixel .share-author,
+.share-card.style-pixel .share-date {
+  color: #fff;
+}
+
+.share-achievement {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 322px;
+  height: auto;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.stamp-date {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  transform: translate(-50%, -50%) rotate(-9deg);
+  white-space: nowrap;
+}
+
+.stamp-date span {
+  display: block;
+  font-size: 21px;
+  line-height: 1.1;
+}
+
+.download-full {
+  width: 100%;
+  min-height: 64px;
+  margin-top: 36px;
+  border-radius: 12px;
+  background: #000;
+  color: #fff;
+  font-family: var(--serif-font);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.export-stage {
+  position: fixed;
+  left: -200vw;
+  top: 0;
+  width: 1626px;
+  pointer-events: none;
 }
 
 @media (max-width: 820px) {
@@ -684,26 +969,71 @@ button {
   }
 
   .import-page {
-    padding: 24px 18px 48px;
+    padding: 20px 18px 34px;
   }
 
   .import-hero {
-    margin: 70px auto 42px;
+    gap: 12px;
+    margin: 42px auto 28px;
   }
 
   .import-hero p {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .dropzone {
-    min-height: 240px;
+    min-height: 400px;
+    padding: 22px;
   }
 
-  .export-card {
-    padding: 30px;
+  .card-close {
+    top: 14px;
+    right: 14px;
+    width: 44px;
+    height: 44px;
+    font-size: 30px;
   }
 
-  .export-quote {
-    font-size: 23px;
+  .card-designer {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    padding: 58px 16px 22px;
+  }
+
+  .card-tabs {
+    gap: 10px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+
+  .card-tabs button {
+    min-width: 86px;
+    min-height: 48px;
+    font-size: 22px;
+  }
+
+  .share-card-preview {
+    height: 520px;
+  }
+
+  .share-card {
+    min-height: 520px;
+    padding: 34px 28px;
+  }
+
+  .share-quote {
+    font-size: 28px;
+  }
+
+  .share-book,
+  .share-author,
+  .share-date {
+    font-size: 20px;
+  }
+
+  .download-full {
+    min-height: 64px;
+    margin-top: 28px;
+    font-size: 24px;
   }
 }
