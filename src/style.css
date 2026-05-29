@@ -84,6 +84,12 @@ button {
   color: #777f8c;
 }
 
+.search img {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
 .search input {
   width: 100%;
   border: 0;
@@ -150,11 +156,21 @@ button {
 
 .view-tabs button,
 .style-options button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   min-height: 34px;
   padding: 0 12px;
   border-radius: 6px;
   background: transparent;
   color: #68717f;
+}
+
+.view-tabs img {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }
 
 .view-tabs .active,
@@ -325,6 +341,12 @@ button {
   font-family: var(--serif-font);
   font-size: 20px;
   font-weight: 700;
+}
+
+.book-back img {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }
 
 .book-detail-head {
@@ -502,10 +524,10 @@ button {
 }
 
 .import-page {
-  width: min(100%, 1120px);
+  display: grid;
+  grid-template-rows: auto 1fr;
   min-height: 100vh;
-  margin: 0 auto;
-  padding: 28px 56px 42px;
+  padding: 28px min(14vw, 220px) 42px;
   background: #f7f7f8;
 }
 
@@ -524,12 +546,20 @@ button {
   height: 16px;
 }
 
+.import-main {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
 .import-hero {
   display: grid;
   justify-items: center;
   gap: 14px;
   max-width: 860px;
-  margin: 54px auto 34px;
+  margin: 0 auto 34px;
   text-align: center;
 }
 
@@ -572,7 +602,8 @@ button {
   place-items: center;
   align-content: center;
   gap: 10px;
-  min-height: 320px;
+  width: 100%;
+  min-height: 220px;
   padding: 26px;
   border: 2px dashed #cfd5dd;
   border-radius: 24px;
@@ -616,33 +647,39 @@ button {
   display: grid;
   place-items: center;
   padding: 32px;
-  overflow: auto;
+  overflow: hidden;
   background: rgba(15, 17, 20, 0.42);
 }
 
 .card-close {
   position: absolute;
-  top: 22px;
-  right: 22px;
+  top: 18px;
+  right: 18px;
   z-index: 21;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #cfcfcf;
-  color: #fff;
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  background: transparent;
+}
+
+.card-close img {
+  display: block;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
 }
 
 .card-designer {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: min(1120px, calc(100vw - 64px));
-  max-height: calc(100vh - 64px);
+  height: min(800px, calc(100vh - 64px));
   padding: 52px 42px 38px;
-  overflow: auto;
+  overflow: hidden;
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
@@ -680,8 +717,8 @@ button {
 
 .share-card-preview {
   width: 100%;
-  height: min(480px, calc(100vh - 320px));
-  min-height: 360px;
+  min-height: 0;
+  flex: 1;
   overflow: auto;
   border-radius: 12px;
   background: #ffffff;
@@ -969,12 +1006,13 @@ button {
   }
 
   .import-page {
+    grid-template-rows: auto 1fr;
     padding: 20px 18px 34px;
   }
 
   .import-hero {
     gap: 12px;
-    margin: 42px auto 28px;
+    margin: 0 auto 28px;
   }
 
   .import-hero p {
@@ -982,21 +1020,26 @@ button {
   }
 
   .dropzone {
-    min-height: 400px;
+    min-height: 200px;
     padding: 22px;
   }
 
   .card-close {
     top: 14px;
     right: 14px;
-    width: 44px;
-    height: 44px;
-    font-size: 30px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .card-close img {
+    width: 36px;
+    height: 36px;
   }
 
   .card-designer {
     width: calc(100vw - 24px);
-    max-height: calc(100vh - 24px);
+    height: calc(100vh - 24px);
+    max-height: none;
     padding: 58px 16px 22px;
   }
 
@@ -1013,7 +1056,8 @@ button {
   }
 
   .share-card-preview {
-    height: 520px;
+    min-height: 0;
+    flex: 1;
   }
 
   .share-card {

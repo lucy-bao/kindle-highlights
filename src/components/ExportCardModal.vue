@@ -1,8 +1,10 @@
 <template>
   <div class="card-modal" @click.self="$emit('close')">
-    <button class="card-close" aria-label="关闭" @click="$emit('close')">×</button>
-
     <section class="card-designer" aria-label="导出卡片">
+      <button class="card-close" aria-label="关闭" @click="$emit('close')">
+        <img :src="closeIcon" alt="" />
+      </button>
+
       <div class="card-tabs" role="tablist" aria-label="卡片样式">
         <button :class="{ active: selectedStyle === 'classic' }" @click="selectedStyle = 'classic'">经典</button>
         <button :class="{ active: selectedStyle === 'tech' }" @click="selectedStyle = 'tech'">科技</button>
@@ -24,6 +26,7 @@
 <script setup>
 import { nextTick, ref } from 'vue'
 import ClassicShareCard from './cards/ClassicShareCard.vue'
+import closeIcon from '../assets/images/关闭实心.svg'
 import achievementBadge from '../assets/images/新成就.png'
 import emailStamp from '../assets/images/email.png'
 import waveFooter from '../assets/images/compiled_wave_illustration.svg'

@@ -3,7 +3,7 @@
     <header class="topbar">
       <button class="brand" @click="$emit('select-book', null)">Kindle书摘</button>
       <label class="search">
-        <span aria-hidden="true">⌕</span>
+        <img :src="searchIcon" alt="" aria-hidden="true" />
         <input
           :value="query"
           type="search"
@@ -23,8 +23,14 @@
         </div>
 
         <div v-if="showViewTabs" class="view-tabs" role="tablist" aria-label="切换视图">
-          <button :class="{ active: viewMode === 'books' }" @click="$emit('update:view-mode', 'books')">▦ 书籍</button>
-          <button :class="{ active: viewMode === 'highlights' }" @click="$emit('update:view-mode', 'highlights')">☰ 划线</button>
+          <button :class="{ active: viewMode === 'books' }" @click="$emit('update:view-mode', 'books')">
+            <img :src="viewMode === 'books' ? gridActiveIcon : gridIcon" alt="" />
+            书籍
+          </button>
+          <button :class="{ active: viewMode === 'highlights' }" @click="$emit('update:view-mode', 'highlights')">
+            <img :src="viewMode === 'highlights' ? listActiveIcon : listIcon" alt="" />
+            划线
+          </button>
         </div>
       </div>
 
@@ -92,15 +98,27 @@
         </section>
       </section>
 
-      <section v-else-if="!hasData" class="empty">
-        <div class="empty-icon">▥</div>
-        <h2>还没有导入划线</h2>
-        <p>导入 Kindle 的 My Clippings.txt 后，书籍、划线和导出卡片会显示在这里。</p>
-        <button @click="$emit('open-import')">导入文件</button>
+      <section v-else-if="!hasData" class="empty import-empty">
+        <div class="import-hero empty-hero">
+          <span class="book-icon">
+            <img :src="bookIcon" alt="" />
+          </span>
+          <h1>让你的 Kindle 划线重获新生</h1>
+          <p>导入 Kindle 的 My Clippings.txt 文件，以优雅的书架模式浏览，并一键生成精美的社交分享卡片。</p>
+        </div>
+
+        <button class="dropzone empty-dropzone" type="button" @click="$emit('open-import')">
+          <img class="upload-icon" :src="uploadIcon" alt="" />
+          <strong>点击导入划线文件</strong>
+          <small>支持 My Clippings.txt 文件</small>
+        </button>
       </section>
 
       <section v-else-if="selectedBook" class="book-detail">
-        <button class="book-back" @click="$emit('select-book', null)">‹ 返回书架</button>
+        <button class="book-back" @click="$emit('select-book', null)">
+          <img :src="backIcon" alt="" />
+          返回书架
+        </button>
 
         <div class="book-detail-head">
           <div class="cover detail-cover">
@@ -183,6 +201,14 @@
 
 <script setup>
 import { computed } from 'vue'
+import backIcon from '../assets/images/返回.svg'
+import bookIcon from '../assets/images/书.svg'
+import gridActiveIcon from '../assets/images/九宫格 (1).svg'
+import gridIcon from '../assets/images/九宫格.svg'
+import listActiveIcon from '../assets/images/列表 (1).svg'
+import listIcon from '../assets/images/列表.svg'
+import searchIcon from '../assets/images/搜索.svg'
+import uploadIcon from '../assets/images/上传.svg'
 import { clippingDateText, compactTitle, pageText } from '../utils/formatters'
 
 const props = defineProps({
