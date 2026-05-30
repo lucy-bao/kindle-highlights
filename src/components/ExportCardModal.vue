@@ -41,9 +41,9 @@ defineEmits(['close'])
 const selectedStyle = ref('classic')
 
 async function downloadCard() {
-  await loadExportFonts()
-  await nextTick()
   const style = exportStyles[selectedStyle.value]
+  await loadExportFonts(style)
+  await nextTick()
   const width = 1626
   const paddingX = 118
   const paddingTop = 76
@@ -174,6 +174,12 @@ const exportStyles = {
   },
 }
 
+const exportFontLoads = {
+  BaDingShiWeiTi16: '54px "BaDingShiWeiTi16"',
+  HuiwenMingchaoGBK: '54px "HuiwenMingchaoGBK"',
+  JiangchengYuanti600: '54px "JiangchengYuanti600"',
+}
+
 function wrapText(ctx, text = '', maxWidth, font) {
   ctx.font = font
   const lines = []
@@ -248,13 +254,17 @@ function loadImage(src) {
   })
 }
 
-async function loadExportFonts() {
+async function loadExportFonts(style) {
   if (!document.fonts?.load) return
 
+  const fontLoad = Object.entries(exportFontLoads).find(([family]) => {
+    return style.quoteFont.includes(`"${family}"`) || style.metaFont.includes(`"${family}"`)
+  })?.[1]
+
+  if (!fontLoad) return
+
   await Promise.allSettled([
-    withTimeout(document.fonts.load('54px "HuiwenMingchaoGBK"'), 3000),
-    withTimeout(document.fonts.load('54px "JiangchengYuanti600"'), 3000),
-    withTimeout(document.fonts.load('54px "BaDingShiWeiTi16"'), 3000),
+    withTimeout(document.fonts.load(fontLoad), 3000),
     withTimeout(document.fonts.ready, 3000),
   ])
 }
