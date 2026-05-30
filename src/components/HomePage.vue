@@ -98,7 +98,7 @@
         </section>
       </section>
 
-      <section v-else-if="!hasData" class="empty import-empty">
+      <section v-else-if="!hasData" class="import-main import-empty">
         <div class="import-hero empty-hero">
           <span class="book-icon">
             <img :src="bookIcon" alt="" />
