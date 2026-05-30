@@ -25,8 +25,8 @@
   background: #f6f6f7;
   --serif-font: "Songti SC", "SimSun", "STSong", serif;
   --vintage-font: "HuiwenMingchaoGBK", "MingLiU", "Songti SC", "SimSun", "STSong", serif;
-  --cute-font: "JiangchengYuanti600", "Microsoft YaHei", sans-serif;
-  --pixel-font: "BaDingShiWeiTi16", "Microsoft YaHei", sans-serif;
+  --cute-font: "JiangchengYuanti600", "Songti SC", "SimSun", "STSong", serif;
+  --pixel-font: "BaDingShiWeiTi16", "Songti SC", "SimSun", "STSong", serif;
   font-family:
     Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-synthesis: none;
