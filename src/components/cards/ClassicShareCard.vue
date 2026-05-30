@@ -21,7 +21,7 @@
 <script setup>
 import { computed } from 'vue'
 import emailStamp from '../../assets/images/email.png'
-import achievementBadge from '../../assets/images/新成就.png'
+import achievementBadge from '../../assets/images/achievement-badge.png'
 import waveFooter from '../../assets/images/compiled_wave_illustration.svg'
 import { clippingDateText } from '../../utils/formatters'
 

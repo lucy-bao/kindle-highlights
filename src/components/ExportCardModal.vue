@@ -27,7 +27,7 @@
 import { nextTick, ref } from 'vue'
 import ClassicShareCard from './cards/ClassicShareCard.vue'
 import closeIcon from '../assets/images/关闭实心.svg'
-import achievementBadge from '../assets/images/新成就.png'
+import achievementBadge from '../assets/images/achievement-badge.png'
 import emailStamp from '../assets/images/email.png'
 import waveFooter from '../assets/images/compiled_wave_illustration.svg'
 import { clippingDateText } from '../utils/formatters'

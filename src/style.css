@@ -4,13 +4,13 @@
 
 @font-face {
   font-family: "HuiwenMingchaoGBK";
-  src: url("./assets/fonts/汇文明朝体GBKv1.001.ttf") format("truetype");
+  src: url("./assets/fonts/huiwen-mingchao-gbk.ttf") format("truetype");
   font-display: swap;
 }
 
 @font-face {
   font-family: "JiangchengYuanti600";
-  src: url("./assets/fonts/江城圆体 600W.ttf") format("truetype");
+  src: url("./assets/fonts/jiangcheng-yuanti-600.ttf") format("truetype");
   font-display: swap;
 }
 
@@ -24,7 +24,7 @@
   color: #1f2328;
   background: #f6f6f7;
   --serif-font: "Songti SC", "SimSun", "STSong", serif;
-  --vintage-font: "HuiwenMingchaoGBK", "汇文明朝体GBK", "MingLiU", "Songti SC", "SimSun", "STSong", serif;
+  --vintage-font: "HuiwenMingchaoGBK", "MingLiU", "Songti SC", "SimSun", "STSong", serif;
   --cute-font: "JiangchengYuanti600", "Microsoft YaHei", sans-serif;
   --pixel-font: "BaDingShiWeiTi16", "Microsoft YaHei", sans-serif;
   font-family:
