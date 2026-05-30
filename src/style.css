@@ -4,19 +4,19 @@
 
 @font-face {
   font-family: "HuiwenMingchaoGBK";
-  src: url("./assets/fonts/huiwen-mingchao-gbk.ttf") format("truetype");
+  src: url("./assets/fonts/huiwen-mingchao-gbk.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "JiangchengYuanti600";
-  src: url("./assets/fonts/jiangcheng-yuanti-600.ttf") format("truetype");
+  src: url("./assets/fonts/jiangcheng-yuanti-600.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "BaDingShiWeiTi16";
-  src: url("./assets/fonts/BaDingShiWeiTi-16.ttf") format("truetype");
+  src: url("./assets/fonts/BaDingShiWeiTi-16.woff2") format("woff2");
   font-display: swap;
 }
 
