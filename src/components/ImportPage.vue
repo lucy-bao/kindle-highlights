@@ -40,9 +40,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import uploadIcon from '../assets/images/上传.svg'
-import bookIcon from '../assets/images/书.svg'
-import backIcon from '../assets/images/返回.svg'
+import uploadIcon from '../assets/images/upload.svg'
+import bookIcon from '../assets/images/book.svg'
+import backIcon from '../assets/images/back.svg'
 
 defineProps({
   error: { type: String, default: '' },

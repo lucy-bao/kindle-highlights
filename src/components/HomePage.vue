@@ -214,14 +214,14 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import backIcon from '../assets/images/返回.svg'
-import bookIcon from '../assets/images/书.svg'
-import gridActiveIcon from '../assets/images/九宫格 (1).svg'
-import gridIcon from '../assets/images/九宫格.svg'
-import listActiveIcon from '../assets/images/列表 (1).svg'
-import listIcon from '../assets/images/列表.svg'
-import searchIcon from '../assets/images/搜索.svg'
-import uploadIcon from '../assets/images/上传.svg'
+import backIcon from '../assets/images/back.svg'
+import bookIcon from '../assets/images/book.svg'
+import gridActiveIcon from '../assets/images/grid-active.svg'
+import gridIcon from '../assets/images/grid.svg'
+import listActiveIcon from '../assets/images/list-active.svg'
+import listIcon from '../assets/images/list.svg'
+import searchIcon from '../assets/images/search.svg'
+import uploadIcon from '../assets/images/upload.svg'
 import { clippingDateText, compactTitle, pageText } from '../utils/formatters'
 
 const props = defineProps({

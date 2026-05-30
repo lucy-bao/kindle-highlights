@@ -26,7 +26,7 @@
 <script setup>
 import { nextTick, ref } from 'vue'
 import ClassicShareCard from './cards/ClassicShareCard.vue'
-import closeIcon from '../assets/images/关闭实心.svg'
+import closeIcon from '../assets/images/close-solid.svg'
 import achievementBadge from '../assets/images/achievement-badge.png'
 import emailStamp from '../assets/images/email.png'
 import waveFooter from '../assets/images/compiled_wave_illustration.svg'
@@ -41,9 +41,7 @@ defineEmits(['close'])
 const selectedStyle = ref('classic')
 
 async function downloadCard() {
-  await document.fonts?.load('54px "HuiwenMingchaoGBK"')
-  await document.fonts?.load('54px "JiangchengYuanti600"')
-  await document.fonts?.load('54px "BaDingShiWeiTi16"')
+  await loadExportFonts()
   await nextTick()
   const style = exportStyles[selectedStyle.value]
   const width = 1626
@@ -57,6 +55,8 @@ async function downloadCard() {
   const reservedTop = style.reservedTop || 0
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
   const quoteLines = wrapText(ctx, props.item.content, width - paddingX * 2, quoteFont)
   const bookLines = wrapText(ctx, props.item.title, 1180, metaFont)
   const contentHeight = quoteLines.length * quoteLineHeight + 54 + bookLines.length * metaLineHeight + metaLineHeight * 2
@@ -74,10 +74,10 @@ async function downloadCard() {
   ctx.fillStyle = style.background
   ctx.fillRect(0, 0, width, height)
   if (style.achievement) {
-    await drawAchievement(ctx)
+    await drawAchievement(ctx).catch(() => {})
   }
   if (style.footer) {
-    await drawWaveFooter(ctx, width, height)
+    await drawWaveFooter(ctx, width, height).catch(() => {})
   }
 
   ctx.fillStyle = style.quote
@@ -95,21 +95,36 @@ async function downloadCard() {
   ctx.fillText(props.item.author, paddingX, y)
 
   if (style.stamp) {
-    await drawStamp(ctx, width, height, clippingDateText(props.item).replaceAll('-', '/'))
+    await drawStamp(ctx, width, height, clippingDateText(props.item).replaceAll('-', '/')).catch(() => {
+      ctx.fillText(clippingDateText(props.item).replaceAll('-', '/'), paddingX, y + metaLineHeight)
+    })
   } else {
     ctx.fillText(clippingDateText(props.item).replaceAll('-', '/'), paddingX, y + metaLineHeight)
   }
 
-  downloadCanvas(canvas)
+  await downloadCanvas(canvas)
 }
 
-function downloadCanvas(canvas) {
+async function downloadCanvas(canvas) {
   const link = document.createElement('a')
   link.download = `kindle-highlight-${Date.now()}.png`
-  link.href = canvas.toDataURL('image/png')
+  link.href = await canvasToDataUrl(canvas)
   document.body.appendChild(link)
   link.click()
   link.remove()
+}
+
+function canvasToDataUrl(canvas) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        resolve(canvas.toDataURL('image/png'))
+        return
+      }
+
+      resolve(URL.createObjectURL(blob))
+    }, 'image/png')
+  })
 }
 
 const exportStyles = {
@@ -132,9 +147,9 @@ const exportStyles = {
   vintage: {
     background: '#f4ecd9',
     book: '#111',
-    metaFont: '32px "HuiwenMingchaoGBK", "汇文明朝体GBK", MingLiU, "Songti SC", SimSun, STSong, serif',
+    metaFont: '32px "HuiwenMingchaoGBK", MingLiU, "Songti SC", SimSun, STSong, serif',
     quote: '#000',
-    quoteFont: '54px "HuiwenMingchaoGBK", "汇文明朝体GBK", MingLiU, "Songti SC", SimSun, STSong, serif',
+    quoteFont: '54px "HuiwenMingchaoGBK", MingLiU, "Songti SC", SimSun, STSong, serif',
     secondary: '#a5a5a5',
     stamp: true,
   },
@@ -207,7 +222,7 @@ async function drawStamp(ctx, width, height, displayDate) {
   ctx.fillStyle = '#8b0000'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.font = '700 34px "HuiwenMingchaoGBK", "汇文明朝体GBK", MingLiU, serif'
+  ctx.font = '700 34px "HuiwenMingchaoGBK", MingLiU, serif'
   ctx.fillText(year || '', 0, -20)
   ctx.fillText(`${month || ''}/${day || ''}`, 0, 20)
   ctx.restore()
@@ -231,5 +246,23 @@ function loadImage(src) {
     image.onerror = reject
     image.src = src
   })
+}
+
+async function loadExportFonts() {
+  if (!document.fonts?.load) return
+
+  await Promise.allSettled([
+    withTimeout(document.fonts.load('54px "HuiwenMingchaoGBK"'), 3000),
+    withTimeout(document.fonts.load('54px "JiangchengYuanti600"'), 3000),
+    withTimeout(document.fonts.load('54px "BaDingShiWeiTi16"'), 3000),
+    withTimeout(document.fonts.ready, 3000),
+  ])
+}
+
+function withTimeout(promise, timeout) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => window.setTimeout(resolve, timeout)),
+  ])
 }
 </script>
