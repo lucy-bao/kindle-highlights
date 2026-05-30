@@ -13,7 +13,9 @@
       :search-groups="searchGroups"
       @open-card="openCard"
       @open-import="openImport"
+      @pick-file-access="pickFileWithSystemDialog"
       @select-book="selectBook"
+      @upload-file="importFile"
       @update:query="query = $event"
       @update:view-mode="viewMode = $event"
     />

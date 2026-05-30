@@ -107,11 +107,24 @@
           <p>导入 Kindle 的 My Clippings.txt 文件，以优雅的书架模式浏览，并一键生成精美的社交分享卡片。</p>
         </div>
 
-        <button class="dropzone empty-dropzone" type="button" @click="$emit('open-import')">
+        <div
+          class="dropzone empty-dropzone"
+          :class="{ dragging: isDragging }"
+          role="button"
+          tabindex="0"
+          @click="triggerFilePick"
+          @keydown.enter.prevent="triggerFilePick"
+          @keydown.space.prevent="triggerFilePick"
+          @dragenter.prevent="isDragging = true"
+          @dragover.prevent="isDragging = true"
+          @dragleave.prevent="isDragging = false"
+          @drop.prevent="onDrop"
+        >
+          <input ref="fileInput" type="file" accept=".txt,text/plain" @click.stop @change="onFileInput" />
           <img class="upload-icon" :src="uploadIcon" alt="" />
           <strong>点击导入划线文件</strong>
           <small>支持 My Clippings.txt 文件</small>
-        </button>
+        </div>
       </section>
 
       <section v-else-if="selectedBook" class="book-detail">
@@ -200,7 +213,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import backIcon from '../assets/images/返回.svg'
 import bookIcon from '../assets/images/书.svg'
 import gridActiveIcon from '../assets/images/九宫格 (1).svg'
@@ -223,7 +236,17 @@ const props = defineProps({
   visibleHighlights: { type: Array, required: true },
 })
 
-defineEmits(['open-card', 'open-import', 'select-book', 'update:query', 'update:view-mode'])
+const emit = defineEmits([
+  'open-card',
+  'open-import',
+  'pick-file-access',
+  'select-book',
+  'upload-file',
+  'update:query',
+  'update:view-mode',
+])
+const fileInput = ref(null)
+const isDragging = ref(false)
 
 const pageTitle = computed(() => {
   if (props.query) return '搜索结果'
@@ -258,5 +281,24 @@ function highlightParts(text = '') {
   }
 
   return parts.length ? parts : [{ text, hit: false }]
+}
+
+function triggerFilePick() {
+  if (window.showOpenFilePicker) {
+    emit('pick-file-access')
+    return
+  }
+
+  fileInput.value?.click()
+}
+
+function onFileInput(event) {
+  emit('upload-file', event.target.files?.[0])
+  event.target.value = ''
+}
+
+function onDrop(event) {
+  isDragging.value = false
+  emit('upload-file', event.dataTransfer.files?.[0])
 }
 </script>
