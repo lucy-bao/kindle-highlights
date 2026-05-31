@@ -103,7 +103,7 @@
           <span class="book-icon">
             <img :src="bookIcon" alt="" />
           </span>
-          <h1>让你的 Kindle 划线重获新生</h1>
+          <h1>让你的 Kindle 书摘重获新生</h1>
           <p>导入 Kindle 的 My Clippings.txt 文件，以优雅的书架模式浏览，并一键生成精美的社交分享卡片。</p>
         </div>
 
@@ -122,8 +122,8 @@
         >
           <input ref="fileInput" type="file" accept=".txt,text/plain" @click.stop @change="onFileInput" />
           <img class="upload-icon" :src="uploadIcon" alt="" />
-          <strong>点击导入划线文件</strong>
-          <small>支持 My Clippings.txt 文件</small>
+          <strong>点击或拖拽文件到此处</strong>
+          <small>电脑连接kindle，打开document文件，导入 My Clippings.txt 文件即可</small>
         </div>
       </section>
 

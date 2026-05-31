@@ -30,7 +30,7 @@
         <input ref="fileInput" type="file" accept=".txt,text/plain" @click.stop @change="onFileInput" />
         <img class="upload-icon" :src="uploadIcon" alt="" />
         <strong>点击或拖拽文件到此处</strong>
-        <small>支持 My Clippings.txt 文件</small>
+        <small>电脑连接kindle，打开document文件，导入 My Clippings.txt 文件即可</small>
       </div>
 
       <p v-if="error" class="error">{{ error }}</p>
