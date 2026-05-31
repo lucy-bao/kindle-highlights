@@ -37,6 +37,9 @@ import { computed, onMounted, ref } from 'vue'
 import ExportCardModal from './components/ExportCardModal.vue'
 import HomePage from './components/HomePage.vue'
 import ImportPage from './components/ImportPage.vue'
+import achievementBadge from './assets/images/achievement-badge.png'
+import emailStamp from './assets/images/email.png'
+import waveFooter from './assets/images/compiled_wave_illustration.svg'
 import { useClippingsStorage } from './composables/useClippingsStorage'
 import { groupByBook } from './parser'
 import { clippingTimeValue } from './utils/formatters'
@@ -102,6 +105,7 @@ onMounted(async () => {
   const result = await restoreLastFile()
   if (result?.highlights) applyHighlights(result.highlights)
   if (result?.message) showStatus(result.message)
+  scheduleLightAssetWarmup()
 })
 
 function openImport() {
@@ -160,5 +164,37 @@ function openCard(item) {
 
 function sortByClippingTime(items) {
   return [...items].sort((a, b) => clippingTimeValue(b) - clippingTimeValue(a))
+}
+
+function scheduleLightAssetWarmup() {
+  window.setTimeout(() => {
+    runWhenIdle(prewarmLightAssets)
+  }, 2500)
+}
+
+function runWhenIdle(callback) {
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(callback, { timeout: 2000 })
+    return
+  }
+
+  window.setTimeout(callback, 0)
+}
+
+function prewarmLightAssets() {
+  preloadSmallImages()
+  preloadPixelFont()
+}
+
+function preloadSmallImages() {
+  ;[emailStamp, achievementBadge, waveFooter].forEach((src) => {
+    const image = new Image()
+    image.src = src
+    image.decode?.().catch(() => {})
+  })
+}
+
+function preloadPixelFont() {
+  document.fonts?.load?.('54px "BaDingShiWeiTi16"').catch(() => {})
 }
 </script>
