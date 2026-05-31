@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import ClassicShareCard from './cards/ClassicShareCard.vue'
 import closeIcon from '../assets/images/close-solid.svg'
 import achievementBadge from '../assets/images/achievement-badge.png'
@@ -39,6 +39,11 @@ const props = defineProps({
 defineEmits(['close'])
 
 const selectedStyle = ref('classic')
+const preloadedImages = new Map()
+
+onMounted(() => {
+  preloadCardImages()
+})
 
 async function downloadCard() {
   const style = exportStyles[selectedStyle.value]
@@ -246,11 +251,30 @@ async function drawAchievement(ctx) {
 }
 
 function loadImage(src) {
+  if (preloadedImages.has(src)) return preloadedImages.get(src)
+
   return new Promise((resolve, reject) => {
     const image = new Image()
-    image.onload = () => resolve(image)
-    image.onerror = reject
+    image.onload = () => {
+      preloadedImages.set(src, Promise.resolve(image))
+      resolve(image)
+    }
+    image.onerror = () => {
+      preloadedImages.delete(src)
+      reject(new Error(`Failed to load image: ${src}`))
+    }
     image.src = src
+  })
+}
+
+function preloadCardImages() {
+  ;[emailStamp, achievementBadge, waveFooter].forEach((src) => {
+    if (!preloadedImages.has(src)) {
+      preloadedImages.set(src, loadImage(src).catch((error) => {
+        preloadedImages.delete(src)
+        throw error
+      }))
+    }
   })
 }
 
